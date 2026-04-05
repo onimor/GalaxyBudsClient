@@ -44,6 +44,7 @@ public class SppMessageReceiver
     public event EventHandler<CradleSerialNumberDecoder>? CradleSerialNumberResponse;
     public event EventHandler<SelfTestDecoder>? SelfTestResponse;
     public event EventHandler<TouchOptions>? OtherOption;
+    public event EventHandler<bool>? GamingModeUpdateResponse;
     public event EventHandler<ExtendedStatusUpdateDecoder>? ExtendedStatusUpdate;
     public event EventHandler<IBasicStatusUpdate>? BaseUpdate;
     public event EventHandler<StatusUpdateDecoder>? StatusUpdate;
@@ -138,6 +139,9 @@ public class SppMessageReceiver
                 break;
             case SetOtherOptionDecoder p:
                 OtherOption?.Invoke(this, p.OptionType);
+                break;
+            case GameModeDecoder p:
+                GamingModeUpdateResponse?.Invoke(this, p.Enabled);
                 break;
             case StatusUpdateDecoder p:
                 StatusUpdate?.Invoke(this, p);

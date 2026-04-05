@@ -97,6 +97,16 @@
                         <ext:RequiresFeatureBehavior Feature="ExtraClearCallSound" />
                     </Interaction.Behaviors>
                 </controls:SettingsSwitchItem>
+
+                <controls:SettingsSwitchItem Content="{ext:Translate {x:Static i18N:Keys.AdvGamingMode}}"
+                                             Description="{ext:Translate {x:Static i18N:Keys.AdvGamingModeDesc}}"
+                                             IsChecked="{Binding IsGamingModeEnabled}"
+                                             Symbol="XboxConsole"
+                                             IsClickEnabled="True">
+                    <Interaction.Behaviors>
+                        <ext:RequiresFeatureBehavior Feature="GamingMode" />
+                    </Interaction.Behaviors>
+                </controls:SettingsSwitchItem>
             </controls:SettingsGroup>
 
             <controls:SettingsGroup>
