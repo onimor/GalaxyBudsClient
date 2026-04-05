@@ -5,6 +5,7 @@ using GalaxyBudsClient.Generated.I18N;
 using GalaxyBudsClient.Interface.Pages;
 using GalaxyBudsClient.Message;
 using GalaxyBudsClient.Message.Decoder;
+using GalaxyBudsClient.Model.Specifications;
 using GalaxyBudsClient.Platform;
 
 namespace GalaxyBudsClient.Interface.ViewModels.Pages;
@@ -12,10 +13,20 @@ namespace GalaxyBudsClient.Interface.ViewModels.Pages;
 public partial class AdvancedPageViewModel : MainPageViewModelBase
 {
     public override Control CreateView() => new AdvancedPage { DataContext = this };
+    
+    public override async void OnNavigatedTo()
+    {
+        if (BluetoothImpl.Instance.IsConnected &&
+            BluetoothImpl.Instance.DeviceSpec.Supports(Features.GamingMode))
+        {
+            await BluetoothImpl.Instance.SendRequestAsync(MsgIds.GAME_MODE);
+        }
+    }
 
     public AdvancedPageViewModel()
     {
         SppMessageReceiver.Instance.ExtendedStatusUpdate += OnExtendedStatusUpdate;
+        SppMessageReceiver.Instance.GamingModeUpdateResponse += OnGameModeUpdate;
         PropertyChanged += OnPropertyChanged;
     }
 
@@ -49,7 +60,16 @@ public partial class AdvancedPageViewModel : MainPageViewModelBase
             case nameof(IsExtraClearCallEnabled):
                 await BluetoothImpl.Instance.SendRequestAsync(MsgIds.EXTRA_CLEAR_SOUND_CALL, IsExtraClearCallEnabled);
                 break;
+            case nameof(IsGamingModeEnabled):
+                await BluetoothImpl.Instance.SendRequestAsync(MsgIds.GAME_MODE, IsGamingModeEnabled);
+                break;
         }
+    }
+    
+    private void OnGameModeUpdate(object? sender, bool enabled)
+    {
+        using var suppressor = SuppressChangeNotifications();
+        IsGamingModeEnabled = enabled;
     }
 
     [Reactive] private bool _isSeamlessConnectionEnabled;
@@ -57,9 +77,9 @@ public partial class AdvancedPageViewModel : MainPageViewModelBase
     [Reactive] private bool _isSidetoneEnabled;
     [Reactive] private bool _isCallpathControlEnabled;
     [Reactive] private bool _isExtraClearCallEnabled;
+    [Reactive] private bool _isGamingModeEnabled;
 
     public override string TitleKey => Keys.MainpageAdvanced;
     public override Symbol IconKey => Symbol.WrenchScrewdriver;
     public override bool ShowsInFooter => false;
 }
-
